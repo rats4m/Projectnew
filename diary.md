@@ -1,6 +1,8 @@
 ## 18th October 2024
 
 - Cloned the project repository ad ensured correct structure according to project guidelines.
+- Test branch created on repository, which is used for testing and practices certian techniques before implementing into project.
+- Began initial testing by creating script for synthetic data simulation.
 
 ### Next Steps:
 
