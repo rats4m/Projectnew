@@ -1,3 +1,11 @@
+## 22nd October 2024
+
+- Have decided that I do not wish to use python within my project due to lack of complexity.
+- Changed a few ideas and tools within the project scope:
+    - Use of rust for data collection and processing
+    - Javascript + WebGL for visualization frameworks.
+    - Use of rust for predictive learning.
+
 ## 18th October 2024
 
 - Cloned the project repository ad ensured correct structure according to project guidelines.
