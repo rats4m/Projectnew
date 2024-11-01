@@ -1,3 +1,8 @@
+## 1st November 2024 
+
+- Created event structure for representing cybersecurity data.
+- Implemented serialization and deserialization using Serde.
+
 ## 22nd October 2024
 
 - Have decided that I do not wish to use python within my project due to lack of complexity.
