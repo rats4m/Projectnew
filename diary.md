@@ -3,6 +3,16 @@
 - Created event structure for representing cybersecurity data.
 - Implemented serialization and deserialization using Serde.
 
+---
+
+- Set up real time data ingestion using Tokio and a TCP listener (use of dummy data).
+
+## Next steps
+
+- Implement offline ingestion for batch data processing. Also figure out how to switch from the use of dummy data with real-time.
+
+---
+
 ## 22nd October 2024
 
 - Have decided that I do not wish to use python within my project due to lack of complexity.
@@ -11,11 +21,15 @@
     - Javascript + WebGL for visualization frameworks.
     - Use of rust for predictive learning.
 
+---
+
 ## 18th October 2024
 
 - Cloned the project repository ad ensured correct structure according to project guidelines.
 - Test branch created on repository, which is used for testing and practices certian techniques before implementing into project.
 - Began initial testing by creating script for synthetic data simulation.
+
+---
 
 ### Next Steps:
 
