@@ -1,13 +1,15 @@
+//! Module to ingest real-time data from a TCP socket and process it.
 use tokio::net::TcpListener;
 use std::io;
 use crate::backend::data_serialization::{deserialize_event, Event};
 
+/// Ingests real-time data from a TCP socket and processes it.
 pub async fn ingest_realtime_data() -> io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:8080").await?;
     println!("Listening for real-time data on 127.0.0.1:8080");
 
     loop {
-        let (mut socket, _) = listener.accept().await?;
+        let (socket, _) = listener.accept().await?;
         println!("Received real-time connection: {:?}", socket);
 
         // Placeholder to read and process real-time data from the socket
