@@ -27,3 +27,8 @@ Cargo.lock
 #Rust
 /product/src/backend/mod.rs 
 /product/src/lib.rs
+
+#Resources
+/product/datasets
+*.csv
+*.json

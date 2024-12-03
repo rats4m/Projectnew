@@ -2,6 +2,27 @@
 
 ---
 
+## 3rd December 2024
+
+### Progress Update
+
+- **Refactored Code:**
+  - Updated `file_loader.rs` to align with code preferences, including:
+    - Enhanced error handling for better readability and debugging.
+    - Improved variable naming for clarity and maintainability.
+  - Refactored `file_loader_test.rs` to:
+    - Extract user-defined variables (e.g., file paths, test content) to the top of the file for better organization.
+    - Added the `use PROJECT::data_ingestion::file_loader::{load_csv, load_json};` import for proper function access.
+    - Simplified and clarified test case structure.
+
+- **Validation and Review:**
+  - Ensured that the updated code aligns with modular design principles and preferences for clarity and maintainability.
+  - Confirmed no additional changes were made to unrelated parts of the `repo_contents.json`.
+
+*Note: The lack of updates in recent months was due to unforeseen circumstances. Progress has now resumed with full focus and commitment.*
+
+---
+
 ## 3rd November 2024
 
 ### Current Position
