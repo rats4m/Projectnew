@@ -1,5 +1,4 @@
-# Final Year Project
+# Cybersecurity Visualization System
 
-This repository has been created to store your final year project.
+This project aims to detect, analyze, and visualize cybersecurity anomalies in real-time and offline using Rust. Modules include data ingestion, machine learning, and visualization.
 
-You may edit it as you like, but please do not remove the default topics or the project members list. These need to stay as currently defined in order for your supervisor to be able to find your project.
