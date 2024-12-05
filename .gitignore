@@ -17,6 +17,18 @@
 .history
 .ionide
 
-###general
+# Added by cargo
+Cargo.toml
+Cargo.lock
 /target
+/product/target
+/product/Cargo.toml
+
+#Rust
+/product/src/backend/mod.rs 
+/product/src/lib.rs
+
+#Resources
 /product/datasets
+*.csv
+*.json
