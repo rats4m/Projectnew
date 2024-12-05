@@ -18,7 +18,5 @@
 .ionide
 
 ###general
-cargo.toml
 /target
-Cargo.lock
 /product/datasets

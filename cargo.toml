@@ -1,0 +1,26 @@
+[package]
+name = "PROJECT"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+csv = "1.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = "0.4"
+
+[[bin]]
+name = "PROJECT"
+path = "product/src/main.rs"
+
+[lib]
+name = "PROJECT"
+path = "product/src/lib.rs"
+
+[[test]]
+name = "file_loader_test"
+path = "product/tests/file_loader_test.rs"
+
+[[test]]
+name = "preprocessor_test"
+path = "product/tests/preprocessor_test.rs"
