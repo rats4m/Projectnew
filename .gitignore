@@ -18,14 +18,13 @@
 .ionide
 
 # Added by cargo
-Cargo.toml
+cargo.toml
 Cargo.lock
 /target
-/product/target
-/product/Cargo.toml
+*.toml
+*.lock
 
 #Rust
-/product/src/backend/mod.rs 
 /product/src/lib.rs
 
 #Resources
