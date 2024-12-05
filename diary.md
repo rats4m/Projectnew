@@ -2,6 +2,33 @@
 
 ---
 
+
+## 5th December 2024
+
+
+
+---
+
+## 4th December 2024
+
+### Progress Update: Preprocessing Module
+
+- **Features Added:**
+  - `remove_duplicates` function to eliminate duplicate records.
+  - `normalize_fields` function to standardize data like timestamps and IP addresses.
+  - `filter_irrelevant_data` function to keep only important fields.
+
+- **Testing:**
+  - All functions were tested in `preprocessor_test.rs`:
+    - Duplicates were removed correctly.
+    - Fields were normalized as expected.
+    - Filtering worked for different test cases.
+
+- **Result:**
+  - All tests passed, and the preprocessing module is ready for integration with the ML engine.
+
+---
+
 ## 3rd December 2024
 
 ### Progress Update
