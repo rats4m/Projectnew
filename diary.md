@@ -5,6 +5,21 @@
 
 ## 5th December 2024
 
+### Progress Update: ML Engine Integration
+
+- **Implemented Features:**
+  - Created `anomaly_detection.rs` to identify suspicious records.
+  - Developed logic to filter anomalies based on the "event_type" field.
+  - Wrote comprehensive unit tests in `anomaly_detection_test.rs` for the module.
+  - Added integration tests in `integration_tests.rs` to validate seamless data flow from preprocessing to anomaly detection.
+
+- **Testing:**
+  - All tests passed successfully:
+    - Verified preprocessing pipeline functions (`remove_duplicates`, `normalize_fields`, `filter_irrelevant_data`) work as expected.
+    - Confirmed accurate anomaly detection for test scenarios.
+
+- **Result:**
+  - The preprocessing and ML engine modules are fully integrated and functional.
 
 
 ---

@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use PROJECT::data_ingestion::file_loader::{load_csv, load_json};
+    use project::data_ingestion::file_loader::{load_csv, load_json};
 
     // User-defined variables
     const TEST_CSV_PATH: &str = "test.csv";

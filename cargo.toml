@@ -1,5 +1,5 @@
 [package]
-name = "PROJECT"
+name = "project"
 version = "0.1.0"
 edition = "2021"
 
@@ -14,7 +14,7 @@ name = "PROJECT"
 path = "product/src/main.rs"
 
 [lib]
-name = "PROJECT"
+name = "project"
 path = "product/src/lib.rs"
 
 [[test]]
@@ -24,3 +24,11 @@ path = "product/tests/file_loader_test.rs"
 [[test]]
 name = "preprocessor_test"
 path = "product/tests/preprocessor_test.rs"
+
+[[test]]
+name = "anomaly_detection_test"
+path = "product/tests/anomaly_detection_test.rs"
+
+[[test]]
+name = "integration_test"
+path = "product/tests/integration_test.rs"
