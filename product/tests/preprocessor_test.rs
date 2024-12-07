@@ -1,23 +1,31 @@
 #[cfg(test)]
 mod tests {
     use project::data_ingestion::preprocessor::{
-        filter_irrelevant_data, normalize_fields, remove_duplicates,
+        filter_irrelevant_data,
+        normalize_fields,
+        remove_duplicates,
     };
     use std::collections::BTreeMap;
 
     #[test]
     fn test_remove_duplicates() {
         let data = vec![
-            [("key1", "value1"), ("key2", "value2")]
+            [
+                ("key1", "value1"),
+                ("key2", "value2"),
+            ]
                 .iter()
                 .cloned()
                 .map(|(k, v)| (k.to_string(), v.to_string()))
                 .collect::<BTreeMap<String, String>>(),
-            [("key1", "value1"), ("key2", "value2")]
+            [
+                ("key1", "value1"),
+                ("key2", "value2"),
+            ]
                 .iter()
                 .cloned()
                 .map(|(k, v)| (k.to_string(), v.to_string()))
-                .collect::<BTreeMap<String, String>>(),
+                .collect::<BTreeMap<String, String>>()
         ];
         let result = remove_duplicates(data);
         assert_eq!(result.len(), 1);
@@ -47,7 +55,7 @@ mod tests {
                 .iter()
                 .cloned()
                 .map(|(k, v)| (k.to_string(), v.to_string()))
-                .collect::<BTreeMap<String, String>>(),
+                .collect::<BTreeMap<String, String>>()
         ];
         let relevant_keys = vec!["key1".to_string()];
         let result = filter_irrelevant_data(data, relevant_keys);

@@ -5,11 +5,10 @@ use std::fs::File;
 use std::io::BufReader;
 
 pub fn load_csv(file_path: &str) -> Result<Vec<HashMap<String, String>>, String> {
-    let file = File::open(file_path)
-        .map_err(|e| format!("Error opening CSV file at '{}': {}", file_path, e))?;
-    let mut csv_reader = ReaderBuilder::new()
-        .has_headers(true)
-        .from_reader(BufReader::new(file));
+    let file = File::open(file_path).map_err(|e|
+        format!("Error opening CSV file at '{}': {}", file_path, e)
+    )?;
+    let mut csv_reader = ReaderBuilder::new().has_headers(true).from_reader(BufReader::new(file));
 
     let headers = csv_reader
         .headers()
@@ -30,11 +29,13 @@ pub fn load_csv(file_path: &str) -> Result<Vec<HashMap<String, String>>, String>
 }
 
 pub fn load_json(file_path: &str) -> Result<Vec<HashMap<String, String>>, String> {
-    let file = File::open(file_path)
-        .map_err(|e| format!("Error opening JSON file at '{}': {}", file_path, e))?;
+    let file = File::open(file_path).map_err(|e|
+        format!("Error opening JSON file at '{}': {}", file_path, e)
+    )?;
     let reader = BufReader::new(file);
 
-    let parsed_json: Value = serde_json::from_reader(reader)
+    let parsed_json: Value = serde_json
+        ::from_reader(reader)
         .map_err(|e| format!("Error parsing JSON file at '{}': {}", file_path, e))?;
 
     if let Value::Array(entries) = parsed_json {
@@ -43,7 +44,8 @@ pub fn load_json(file_path: &str) -> Result<Vec<HashMap<String, String>>, String
             .filter_map(|entry| {
                 if let Value::Object(obj) = entry {
                     Some(
-                        obj.iter()
+                        obj
+                            .iter()
                             .filter_map(|(key, value)| {
                                 if let Value::String(text) = value {
                                     Some((key.clone(), text.clone()))
@@ -51,7 +53,7 @@ pub fn load_json(file_path: &str) -> Result<Vec<HashMap<String, String>>, String
                                     None
                                 }
                             })
-                            .collect::<HashMap<String, String>>(),
+                            .collect::<HashMap<String, String>>()
                     )
                 } else {
                     None

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use project::data_ingestion::file_loader::{load_csv, load_json};
+    use project::data_ingestion::file_loader::{ load_csv, load_json };
     use std::fs;
 
     const TEST_CSV_PATH: &str = "test.csv";

@@ -1,15 +1,15 @@
-use smartcore::cluster::kmeans::{KMeans, KMeansParameters};
+use smartcore::cluster::kmeans::{ KMeans, KMeansParameters };
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 use std::collections::BTreeMap;
 
 fn calculate_cluster_center(points: &[f64]) -> f64 {
-    points.iter().sum::<f64>() / points.len() as f64
+    points.iter().sum::<f64>() / (points.len() as f64)
 }
 
 pub fn identify_anomalies(
     data: Vec<BTreeMap<String, String>>,
     threshold: f64,
-    k: usize,
+    k: usize
 ) -> Vec<BTreeMap<String, String>> {
     let numeric_data: Vec<Vec<f64>> = data
         .iter()
@@ -43,11 +43,7 @@ pub fn identify_anomalies(
                     .iter()
                     .zip(labels.iter())
                     .filter_map(|(point, &label)| {
-                        if label == labels[index] {
-                            Some(point[0])
-                        } else {
-                            None
-                        }
+                        if label == labels[index] { Some(point[0]) } else { None }
                     })
                     .collect();
 
