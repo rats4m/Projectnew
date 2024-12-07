@@ -2,6 +2,10 @@ use smartcore::cluster::kmeans::{KMeans, KMeansParameters};
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
 use std::collections::BTreeMap;
 
+fn calculate_cluster_center(points: &[f64]) -> f64 {
+    points.iter().sum::<f64>() / points.len() as f64
+}
+
 pub fn identify_anomalies(
     data: Vec<BTreeMap<String, String>>,
     threshold: f64,
@@ -25,8 +29,7 @@ pub fn identify_anomalies(
     let matrix = DenseMatrix::from_2d_vec(&numeric_data);
 
     let kmeans = KMeans::fit(&matrix, KMeansParameters::default().with_k(k)).unwrap_or_else(|e| {
-        eprintln!("K-Means clustering failed: {}", e);
-        panic!("Clustering error");
+        panic!("K-Means clustering failed: {}", e);
     });
 
     let labels = kmeans.predict(&matrix).unwrap();
@@ -49,8 +52,7 @@ pub fn identify_anomalies(
                     .collect();
 
                 if !cluster_points.is_empty() {
-                    let center: f64 =
-                        cluster_points.iter().sum::<f64>() / cluster_points.len() as f64;
+                    let center = calculate_cluster_center(&cluster_points);
                     let distance = (value - center).abs();
                     if distance > threshold {
                         anomalies.push(record);
