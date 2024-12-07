@@ -1,8 +1,8 @@
-use std::fs::File;
-use std::io::{BufReader};
-use std::collections::HashMap;
-use serde_json::Value;
 use csv::ReaderBuilder;
+use serde_json::Value;
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::BufReader;
 
 pub fn load_csv(file_path: &str) -> Result<Vec<HashMap<String, String>>, String> {
     let file = File::open(file_path)
@@ -42,15 +42,17 @@ pub fn load_json(file_path: &str) -> Result<Vec<HashMap<String, String>>, String
             .iter()
             .filter_map(|entry| {
                 if let Value::Object(obj) = entry {
-                    Some(obj.iter()
-                        .filter_map(|(key, value)| {
-                            if let Value::String(text) = value {
-                                Some((key.clone(), text.clone()))
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<HashMap<String, String>>())
+                    Some(
+                        obj.iter()
+                            .filter_map(|(key, value)| {
+                                if let Value::String(text) = value {
+                                    Some((key.clone(), text.clone()))
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect::<HashMap<String, String>>(),
+                    )
                 } else {
                     None
                 }

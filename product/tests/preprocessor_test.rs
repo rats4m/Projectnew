@@ -1,7 +1,9 @@
 #[cfg(test)]
 mod tests {
+    use project::data_ingestion::preprocessor::{
+        filter_irrelevant_data, normalize_fields, remove_duplicates,
+    };
     use std::collections::BTreeMap;
-    use project::data_ingestion::preprocessor::{remove_duplicates, normalize_fields, filter_irrelevant_data};
 
     #[test]
     fn test_remove_duplicates() {

@@ -1,5 +1,5 @@
-use std::collections::{HashSet, BTreeMap};
 use chrono;
+use std::collections::{BTreeMap, HashSet};
 
 pub fn remove_duplicates(data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
     let mut seen = HashSet::new();
@@ -32,8 +32,6 @@ pub fn filter_irrelevant_data(
     relevant_keys: Vec<String>,
 ) -> Vec<BTreeMap<String, String>> {
     data.into_iter()
-        .filter(|record| {
-            record.keys().any(|key| relevant_keys.contains(key))
-        })
+        .filter(|record| record.keys().any(|key| relevant_keys.contains(key)))
         .collect()
 }
