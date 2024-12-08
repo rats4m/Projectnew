@@ -1,62 +1,81 @@
-use smartcore::cluster::kmeans::{ KMeans, KMeansParameters };
 use smartcore::linalg::naive::dense_matrix::DenseMatrix;
-use std::collections::BTreeMap;
+use smartcore::cluster::kmeans::{ KMeans, KMeansParameters };
+use std::collections::HashSet;
 
-fn calculate_cluster_center(points: &[f64]) -> f64 {
-    points.iter().sum::<f64>() / (points.len() as f64)
+pub struct AnomalyDetectionResult {
+    pub anomalies: HashSet<usize>,
+    pub cluster_labels: Vec<usize>,
 }
 
-pub fn identify_anomalies(
-    data: Vec<BTreeMap<String, String>>,
-    threshold: f64,
-    k: usize
-) -> Vec<BTreeMap<String, String>> {
-    let numeric_data: Vec<Vec<f64>> = data
-        .iter()
-        .filter_map(|record| {
-            record
-                .get("metric_value")
-                .and_then(|value| value.parse::<f64>().ok())
-                .map(|v| vec![v])
-        })
-        .collect();
-
-    if numeric_data.len() < k {
-        eprintln!("Not enough data points for K-Means clustering");
-        return vec![];
+pub fn detect_anomalies(
+    data: Vec<Vec<f64>>,
+    num_clusters: usize,
+    threshold: f64
+) -> Result<AnomalyDetectionResult, String> {
+    if data.is_empty() || data[0].is_empty() {
+        return Err("Input data must not be empty or malformed.".to_string());
     }
 
-    let matrix = DenseMatrix::from_2d_vec(&numeric_data);
+    let rows = data.len();
+    let cols = data[0].len();
+    let flat_data: Vec<f64> = data.into_iter().flatten().collect();
+    let matrix = DenseMatrix::from_array(rows, cols, &flat_data);
 
-    let kmeans = KMeans::fit(&matrix, KMeansParameters::default().with_k(k)).unwrap_or_else(|e| {
-        panic!("K-Means clustering failed: {}", e);
-    });
+    let kmeans = KMeans::fit(&matrix, KMeansParameters::default().with_k(num_clusters)).map_err(|e|
+        format!("KMeans fitting failed: {}", e)
+    )?;
 
-    let labels = kmeans.predict(&matrix).unwrap();
+    let cluster_labels_f64 = kmeans
+        .predict(&matrix)
+        .map_err(|e| format!("Prediction failed: {}", e))?;
 
-    let mut anomalies = Vec::new();
+    let cluster_labels: Vec<usize> = cluster_labels_f64
+        .into_iter()
+        .map(|label| label as usize)
+        .collect();
 
-    for (index, record) in data.into_iter().enumerate() {
-        if let Some(metric_value) = record.get("metric_value") {
-            if let Ok(value) = metric_value.parse::<f64>() {
-                let cluster_points: Vec<f64> = numeric_data
-                    .iter()
-                    .zip(labels.iter())
-                    .filter_map(|(point, &label)| {
-                        if label == labels[index] { Some(point[0]) } else { None }
-                    })
-                    .collect();
+    let mut centroids = vec![vec![0.0; cols]; num_clusters];
+    let mut cluster_sizes = vec![0; num_clusters];
 
-                if !cluster_points.is_empty() {
-                    let center = calculate_cluster_center(&cluster_points);
-                    let distance = (value - center).abs();
-                    if distance > threshold {
-                        anomalies.push(record);
-                    }
-                }
+    for (index, &label) in cluster_labels.iter().enumerate() {
+        let row_start = index * cols;
+        let row_end = row_start + cols;
+        let row = &flat_data[row_start..row_end];
+
+        for (j, &value) in row.iter().enumerate() {
+            centroids[label][j] += value;
+        }
+        cluster_sizes[label] += 1;
+    }
+
+    for (centroid, &size) in centroids.iter_mut().zip(cluster_sizes.iter()) {
+        if size > 0 {
+            for value in centroid.iter_mut() {
+                *value /= size as f64;
             }
         }
     }
 
-    anomalies
+    let mut anomalies = HashSet::new();
+
+    for (index, &label) in cluster_labels.iter().enumerate() {
+        let row_start = index * cols;
+        let row_end = row_start + cols;
+        let row = &flat_data[row_start..row_end];
+        let centroid = &centroids[label];
+        let distance: f64 = row
+            .iter()
+            .zip(centroid.iter())
+            .map(|(a, b)| (a - b).powi(2))
+            .sum();
+
+        if distance.sqrt() > threshold {
+            anomalies.insert(index);
+        }
+    }
+
+    Ok(AnomalyDetectionResult {
+        anomalies,
+        cluster_labels,
+    })
 }
