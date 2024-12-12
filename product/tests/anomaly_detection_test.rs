@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use project::ml_engine::anomaly_detection::detect_anomalies;
-    use std::collections::BTreeMap;
 
     #[test]
     fn test_valid_anomalies() {

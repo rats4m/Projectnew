@@ -28,6 +28,7 @@ fn main() {
         .map(|record| record.into_iter().collect())
         .collect();
     let cleaned_data = normalize_fields(remove_duplicates(raw_data));
+
     let anomalies = detect_anomalies(cleaned_data.clone(), "metric_value", 50.0);
 
     if let Err(e) = visualize_anomalies(anomalies.clone(), "metric_value") {
