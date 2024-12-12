@@ -12,7 +12,11 @@ pub fn detect_anomalies(
             match value.parse::<f64>() {
                 Ok(parsed_value) if parsed_value > threshold => {
                     anomalies.push(record.clone());
-                    log::info!("Anomaly detected: {:?} exceeds threshold {}", record, threshold);
+                    log::info!(
+                        "Anomaly detected: {:?} exceeds threshold {}",
+                        record,
+                        threshold
+                    );
                 }
                 Ok(_) => continue,
                 Err(_) => log::warn!("Non-numeric value encountered for key '{}': {}", key, value),
