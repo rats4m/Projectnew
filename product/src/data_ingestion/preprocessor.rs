@@ -1,42 +1,88 @@
-use chrono;
-use std::collections::{ BTreeMap, HashSet };
+use std::collections::{BTreeMap, HashSet};
+use chrono::{NaiveDateTime, ParseError};
+use log::{info, warn, error};
 
+/// Normalize timestamps to a standard format.
+pub fn normalize_timestamps(
+    data: &mut Vec<BTreeMap<String, String>>,
+    timestamp_key: &str,
+    format: &str,
+) {
+    info!("Starting timestamp normalization using format: {}", format);
+    for record in data.iter_mut() {
+        if let Some(timestamp) = record.get(timestamp_key) {
+            match NaiveDateTime::parse_from_str(timestamp, format) {
+                Ok(parsed) => {
+                    record.insert(timestamp_key.to_string(), parsed.to_string());
+                }
+                Err(e) => {
+                    warn!(
+                        "Failed to parse timestamp '{}' in record: {:?} | Error: {}",
+                        timestamp, record, e
+                    );
+                }
+            }
+        } else {
+            warn!(
+                "Record missing timestamp key '{}': {:?}",
+                timestamp_key, record
+            );
+        }
+    }
+    info!("Timestamp normalization completed.");
+}
 
-
-pub fn remove_duplicates(data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
-
+/// Remove duplicate records based on a unique key.
+pub fn remove_duplicates(data: &mut Vec<BTreeMap<String, String>>, unique_key: &str) {
+    info!("Starting duplicate removal based on key: {}", unique_key);
     let mut seen = HashSet::new();
-    data.into_iter()
-        .filter(|record| seen.insert(record.clone()))
-        .collect()
+    let initial_len = data.len();
 
-}
-
-
-pub fn normalize_fields(mut data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
-    for record in &mut data {
-        if let Some(ip) = record.get_mut("ip_address") {
-            *ip = ip.trim().to_lowercase();
+    data.retain(|record| {
+        if let Some(value) = record.get(unique_key) {
+            if seen.contains(value) {
+                warn!("Duplicate record found and removed: {:?}", record);
+                false
+            } else {
+                seen.insert(value.clone());
+                true
+            }
+        } else {
+            warn!(
+                "Record missing unique key '{}': {:?}",
+                unique_key, record
+            );
+            false
         }
-        if let Some(timestamp) = record.get_mut("timestamp") {
-            *timestamp = normalize_timestamp(timestamp);
+    });
+
+    let removed = initial_len - data.len();
+    info!("Duplicate removal completed. Records removed: {}", removed);
+}
+
+/// Validate records and remove those with missing required keys.
+pub fn validate_records(data: &mut Vec<BTreeMap<String, String>>, required_keys: &[&str]) {
+    info!("Starting record validation for required keys: {:?}", required_keys);
+    let initial_len = data.len();
+
+    data.retain(|record| {
+        let missing_keys: Vec<&str> = required_keys
+            .iter()
+            .filter(|&&key| !record.contains_key(key))
+            .cloned()
+            .collect();
+
+        if !missing_keys.is_empty() {
+            warn!(
+                "Record missing required keys {:?}: {:?}",
+                missing_keys, record
+            );
+            false
+        } else {
+            true
         }
-    }
-    data
-}
+    });
 
-fn normalize_timestamp(timestamp: &str) -> String {
-    match chrono::DateTime::parse_from_rfc3339(timestamp) {
-        Ok(dt) => dt.to_rfc3339(),
-        Err(_) => timestamp.to_string(),
-    }
-}
-
-pub fn filter_irrelevant_data(
-    data: Vec<BTreeMap<String, String>>,
-    relevant_keys: Vec<String>
-) -> Vec<BTreeMap<String, String>> {
-    data.into_iter()
-        .filter(|record| record.keys().any(|key| relevant_keys.contains(key)))
-        .collect()
+    let removed = initial_len - data.len();
+    info!("Record validation completed. Invalid records removed: {}", removed);
 }

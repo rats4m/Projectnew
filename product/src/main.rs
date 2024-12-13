@@ -1,43 +1,49 @@
+use std::collections::BTreeMap;
+
+use data_ingestion::{file_loader, preprocessor};
+use ml_engine::anomaly_detection;
+use visualizer::real_time;
+use utils::{logger, error::PipelineError};
+
 mod data_ingestion;
 mod ml_engine;
 mod visualizer;
 mod utils;
 
-use data_ingestion::file_loader::load_csv;
-use data_ingestion::preprocessor::{remove_duplicates, normalize_fields};
-use ml_engine::anomaly_detection::detect_anomalies;
-use visualizer::real_time::visualize_anomalies;
-use utils::{logger::init_logger, error::CustomError};
-use std::collections::BTreeMap;
-use std::process;
+fn main() -> Result<(), PipelineError> {
+    // Initialize logging
+    logger::init_logger();
 
-fn main() {
-    init_logger();
+    // Step 1: Load data from CSV
+    log::info!("Loading data from CSV file...");
+    let mut data = file_loader::load_csv("product/datasets/dataset.csv")
+        .map_err(|e| PipelineError::FileLoadError(format!("Failed to load CSV: {}", e)))?;
 
-    match run_pipeline() {
-        Ok(_) => log::info!("Pipeline executed successfully."),
-        Err(e) => {
-            log::error!("Pipeline execution failed: {}", e);
-            process::exit(1);
-        }
+    log::info!("Data successfully loaded. Total records: {}", data.len());
+
+    // Step 2: Preprocess the data
+    log::info!("Preprocessing data...");
+    preprocessor::normalize_timestamps(&mut data, "timestamp", "%Y-%m-%d %H:%M:%S");
+    preprocessor::remove_duplicates(&mut data, "id");
+    preprocessor::validate_records(&mut data, &["id", "timestamp", "value"]);
+    log::info!("Preprocessing completed. Remaining records: {}", data.len());
+
+    // Step 3: Detect anomalies
+    log::info!("Detecting anomalies...");
+    let threshold = 10.0; // Example threshold
+    let anomalies = anomaly_detection::detect_anomalies(&data, "value", threshold);
+
+    if anomalies.is_empty() {
+        log::warn!("No anomalies detected.");
+    } else {
+        log::info!("Detected {} anomalies.", anomalies.len());
     }
-}
 
-fn run_pipeline() -> Result<(), CustomError> {
-    let file_path = "product/datasets/sample.csv";
+    // Step 4: Visualize anomalies in real-time
+    log::info!("Visualizing anomalies...");
+    real_time::visualize_anomalies(data, "value", threshold)
+        .map_err(|e| PipelineError::DetectionError(format!("Visualization error: {}", e)))?;
 
-    let raw_data: Vec<BTreeMap<String, String>> = load_csv(file_path)
-        .map_err(|e| CustomError::FileLoadError(e.to_string()))?
-        .into_iter()
-        .map(|record| record.into_iter().collect())
-        .collect();
-
-    let cleaned_data = normalize_fields(remove_duplicates(raw_data));
-
-    let anomalies = detect_anomalies(cleaned_data, "metric_value", 50.0);
-
-    visualize_anomalies(anomalies, "metric_value")
-        .map_err(|e| CustomError::VisualizationError(e.to_string()))?;
-
+    log::info!("Processing and visualization completed successfully.");
     Ok(())
 }

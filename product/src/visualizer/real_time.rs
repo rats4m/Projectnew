@@ -1,53 +1,74 @@
-use plotters::chart::ChartBuilder;
-use plotters::prelude::*;
-use plotters::style::colors::RED;
+use plotly::{Plot, Scatter};
+use plotly::common::{Mode, Marker};
 use std::collections::BTreeMap;
+use log::{info, warn, error};
 
+/// Visualize anomalies using Plotly.
+/// Creates a line graph with anomalies highlighted as points.
 pub fn visualize_anomalies(
     data: Vec<BTreeMap<String, String>>,
     key: &str,
+    threshold: f64,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let values: Vec<f64> = data
+    info!(
+        "Starting visualization. Key: '{}', Threshold: {}",
+        key, threshold
+    );
+
+    if data.is_empty() {
+        warn!("No data available for visualization.");
+        return Err("No data to visualize".into());
+    }
+
+    let values: Vec<(f64, f64)> = data
         .iter()
-        .filter_map(|record| record.get(key))
-        .filter_map(|value| value.parse::<f64>().ok())
+        .enumerate()
+        .filter_map(|(i, record)| {
+            record.get(key).and_then(|value| value.parse::<f64>().ok()).map(|v| (i as f64, v))
+        })
         .collect();
 
     if values.is_empty() {
-        log::warn!(
-            "No numeric values found for visualization under key '{}'",
-            key
-        );
-        return Err("No valid data to visualize".into());
+        warn!("No valid numeric data found for key '{}'.", key);
+        return Err(format!("No valid data to visualize for key '{}'", key).into());
     }
 
-    let root_area = BitMapBackend::new("anomalies.png", (1024, 768)).into_drawing_area();
-    root_area.fill(&WHITE)?;
+    let (x, y): (Vec<f64>, Vec<f64>) = values.iter().cloned().unzip();
 
-    let max_value = *values
+    let anomalies: Vec<(f64, f64)> = values
         .iter()
-        .max_by(|a, b| a.partial_cmp(b).unwrap())
-        .unwrap();
-    let min_value = *values
-        .iter()
-        .min_by(|a, b| a.partial_cmp(b).unwrap())
-        .unwrap();
+        .cloned()
+        .filter(|&(_, v)| v > threshold)
+        .collect();
 
-    let mut chart = ChartBuilder::on(&root_area)
-        .caption("Anomaly Visualization", ("sans-serif", 30).into_font())
-        .margin(10)
-        .x_label_area_size(30)
-        .y_label_area_size(40)
-        .build_cartesian_2d(0..values.len() as u32, min_value..max_value)?;
+    let (anomaly_x, anomaly_y): (Vec<f64>, Vec<f64>) = anomalies.iter().cloned().unzip();
 
-    chart.configure_mesh().draw()?;
+    // Log anomaly details
+    if anomalies.is_empty() {
+        info!("No anomalies detected above the threshold.");
+    } else {
+        info!(
+            "Detected {} anomalies above the threshold. Highlighting in visualization.",
+            anomalies.len()
+        );
+    }
 
-    chart.draw_series(LineSeries::new(
-        values.iter().enumerate().map(|(i, &v)| (i as u32, v)),
-        &RED,
-    ))?;
+    let line_trace = Scatter::new(x.clone(), y.clone())
+        .mode(Mode::LinesMarkers)
+        .name("Data Points")
+        .marker(Marker::new().color("blue"));
 
-    log::info!("Anomalies visualized and saved to anomalies.png");
+    let anomaly_trace = Scatter::new(anomaly_x.clone(), anomaly_y.clone())
+        .mode(Mode::Markers)
+        .name("Anomalies")
+        .marker(Marker::new().color("red").size(10));
 
+    let mut plot = Plot::new();
+    plot.add_trace(line_trace);
+    plot.add_trace(anomaly_trace);
+
+    plot.show(); // Open in browser for interactivity
+
+    info!("Visualization completed successfully.");
     Ok(())
 }

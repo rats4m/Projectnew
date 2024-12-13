@@ -2,6 +2,42 @@
 
 ---
 
+### 13th December 2024
+
+### Changes Implemented:
+1. **Project Integration:**
+   - Connected all modules in `main.rs` to implement end-to-end functionality.
+   - Verified workflow: Load → Preprocess → Detect Anomalies → Visualize.
+
+2. **Module Enhancements:**
+   - **File Loader (`file_loader.rs`):**
+     - Added robust error handling for invalid files.
+     - Included detailed logs for loading and parsing steps.
+   - **Preprocessor (`preprocessor.rs`):**
+     - Improved timestamp normalization with fallback for parsing errors.
+     - Added logging for deduplication and record validation.
+   - **Anomaly Detection (`anomaly_detection.rs`):**
+     - Modularized threshold logic and added validation for numeric parsing.
+     - Included warnings for missing keys or invalid data.
+   - **Error Handling (`error.rs`):**
+     - Extended error types to include `MissingKeyError`, `InvalidDataError`, and `ThresholdViolation`.
+   - **Logger (`logger.rs`):**
+     - Enhanced with dynamic log levels and structured timestamped messages.
+   - **Visualization (`real_time.rs`):**
+     - Added fallbacks for empty datasets and enhanced usability with red markers for anomalies.
+
+3. **Testing and Validation:**
+   - Verified functionality with a sample CSV (`dataset.csv`) showcasing anomalies and normal trends.
+   - Ensured visualization opens automatically in the default browser and highlights anomalies.
+
+### Challenges Faced:
+- Handling mismatched headers and data rows in CSV files.
+- Ensuring seamless fallback for missing or invalid data during anomaly detection.
+
+### Next Steps:
+- Conduct further tests for edge cases in preprocessing and anomaly detection.
+- Prepare a demo video showcasing program functionality for interim submission.
+
 ### 9th–12th December 2024
 
 **9th December:**  

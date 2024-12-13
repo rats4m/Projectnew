@@ -1,18 +1,30 @@
-use std::fmt;
-
 #[derive(Debug)]
-pub enum CustomError {
+pub enum PipelineError {
     FileLoadError(String),
-    VisualizationError(String),
+    PreprocessError(String),
+    DetectionError(String),
+    MissingKeyError(String),
+    InvalidDataError(String),
+    ThresholdViolation(String),
 }
 
-impl fmt::Display for CustomError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for PipelineError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CustomError::FileLoadError(msg) => write!(f, "File Load Error: {}", msg),
-            CustomError::VisualizationError(msg) => write!(f, "Visualization Error: {}", msg),
+            PipelineError::FileLoadError(msg) => write!(f, "File Load Error: {}", msg),
+            PipelineError::PreprocessError(msg) => write!(f, "Preprocess Error: {}", msg),
+            PipelineError::DetectionError(msg) => write!(f, "Detection Error: {}", msg),
+            PipelineError::MissingKeyError(key) => {
+                write!(f, "Missing Key Error: Required key '{}' is missing.", key)
+            }
+            PipelineError::InvalidDataError(data) => {
+                write!(f, "Invalid Data Error: Data '{}' is not in the expected format.", data)
+            }
+            PipelineError::ThresholdViolation(msg) => {
+                write!(f, "Threshold Violation: {}", msg)
+            }
         }
     }
 }
 
-impl std::error::Error for CustomError {}
+impl std::error::Error for PipelineError {}

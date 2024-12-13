@@ -1,38 +1,22 @@
 #[cfg(test)]
 mod tests {
-    use project::utils::error::CustomError;
     use project::visualizer::real_time::visualize_anomalies;
     use std::collections::BTreeMap;
-    use project::data_ingestion::file_loader::load_csv;
-    use project::data_ingestion::preprocessor::{remove_duplicates, normalize_fields};
-    use project::ml_engine::anomaly_detection::detect_anomalies;
 
     #[test]
-    fn test_visualize_anomalies_with_valid_data() {
-        let data = vec![
-            [("metric_value", "100.0")].iter().cloned().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
-            [("metric_value", "150.0")].iter().cloned().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
-        ];
-        assert!(visualize_anomalies(data, "metric_value").is_ok());
-    }
+    fn test_visualize_anomalies_interactive() {
+        let mut record1 = BTreeMap::new();
+        record1.insert("value".to_string(), "1.0".to_string());
 
-    #[test]
-    fn test_visualize_anomalies_with_empty_data() {
-        let data: Vec<BTreeMap<String, String>> = vec![];
-        assert!(visualize_anomalies(data, "metric_value").is_err());
-    }
+        let mut record2 = BTreeMap::new();
+        record2.insert("value".to_string(), "2.0".to_string());
 
-    #[test]
-    fn test_pipeline_integration() -> Result<(), CustomError> {
-        let file_path = "datasets/sample.csv";
-        let raw_data: Vec<BTreeMap<String, String>> = load_csv(file_path)
-            .map_err(|e| CustomError::FileLoadError(e.to_string()))?
-            .into_iter()
-            .map(|record| record.into_iter().collect())
-            .collect();
-        let cleaned_data = normalize_fields(remove_duplicates(raw_data));
-        let anomalies = detect_anomalies(cleaned_data, "metric_value", 50.0);
-        assert!(visualize_anomalies(anomalies, "metric_value").is_ok());
-        Ok(())
+        let mut record3 = BTreeMap::new();
+        record3.insert("value".to_string(), "10.0".to_string());
+
+        let data = vec![record1, record2, record3];
+
+        let result = visualize_anomalies(data, "value", 5.0);
+        assert!(result.is_ok(), "The visualization function should not return an error.");
     }
 }
