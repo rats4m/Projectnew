@@ -1,12 +1,25 @@
 use plotly::{Plot, Scatter};
 use plotly::common::{Mode, Marker};
 use std::collections::BTreeMap;
+use log::{info, warn, error};
 
+/// Visualize anomalies using Plotly.
+/// Creates a line graph with anomalies highlighted as points.
 pub fn visualize_anomalies(
     data: Vec<BTreeMap<String, String>>,
     key: &str,
     threshold: f64,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    info!(
+        "Starting visualization. Key: '{}', Threshold: {}",
+        key, threshold
+    );
+
+    if data.is_empty() {
+        warn!("No data available for visualization.");
+        return Err("No data to visualize".into());
+    }
+
     let values: Vec<(f64, f64)> = data
         .iter()
         .enumerate()
@@ -16,8 +29,8 @@ pub fn visualize_anomalies(
         .collect();
 
     if values.is_empty() {
-        eprintln!("No valid data to visualize.");
-        return Err("No valid data".into());
+        warn!("No valid numeric data found for key '{}'.", key);
+        return Err(format!("No valid data to visualize for key '{}'", key).into());
     }
 
     let (x, y): (Vec<f64>, Vec<f64>) = values.iter().cloned().unzip();
@@ -29,6 +42,16 @@ pub fn visualize_anomalies(
         .collect();
 
     let (anomaly_x, anomaly_y): (Vec<f64>, Vec<f64>) = anomalies.iter().cloned().unzip();
+
+    // Log anomaly details
+    if anomalies.is_empty() {
+        info!("No anomalies detected above the threshold.");
+    } else {
+        info!(
+            "Detected {} anomalies above the threshold. Highlighting in visualization.",
+            anomalies.len()
+        );
+    }
 
     let line_trace = Scatter::new(x.clone(), y.clone())
         .mode(Mode::LinesMarkers)
@@ -44,7 +67,8 @@ pub fn visualize_anomalies(
     plot.add_trace(line_trace);
     plot.add_trace(anomaly_trace);
 
-    plot.show(); // Opens in browser for interactivity
+    plot.show(); // Open in browser for interactivity
 
+    info!("Visualization completed successfully.");
     Ok(())
 }
