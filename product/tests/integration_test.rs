@@ -13,13 +13,15 @@ mod tests {
             [("metric_value", "100.0")].iter().cloned().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
             [("metric_value", "150.0")].iter().cloned().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
         ];
-        assert!(visualize_anomalies(data, "metric_value").is_ok());
+        let threshold = 50.0;
+        assert!(visualize_anomalies(data, "metric_value", threshold).is_ok());
     }
 
     #[test]
     fn test_visualize_anomalies_with_empty_data() {
         let data: Vec<BTreeMap<String, String>> = vec![];
-        assert!(visualize_anomalies(data, "metric_value").is_err());
+        let threshold = 50.0;
+        assert!(visualize_anomalies(data, "metric_value", threshold).is_err());
     }
 
     #[test]
@@ -32,7 +34,8 @@ mod tests {
             .collect();
         let cleaned_data = normalize_fields(remove_duplicates(raw_data));
         let anomalies = detect_anomalies(cleaned_data, "metric_value", 50.0);
-        assert!(visualize_anomalies(anomalies, "metric_value").is_ok());
+        let threshold = 50.0;
+        assert!(visualize_anomalies(anomalies, "metric_value", threshold).is_ok());
         Ok(())
     }
 }
