@@ -2,6 +2,31 @@
 
 ---
 
+### 9th–12th December 2024
+
+**9th December:**  
+- Reviewed project context, files, and codebase to ensure alignment with interim goals.  
+- Enhanced `anomaly_detection.rs` with robust logging and additional edge case handling.  
+- Drafted and tested `anomaly_detection_test.rs` to validate detection logic.  
+
+**10th December:**  
+- Designed and implemented `real_time.rs` for rendering real-time anomaly visualizations.  
+- Integrated `plotters` crate for graphing anomalies dynamically.  
+- Verified rendering functionality with mock data and real-world datasets.  
+
+**11th December:**  
+- Developed `logger.rs` for centralized logging, ensuring pipeline observability.  
+- Added `error.rs` to standardize error reporting across modules.  
+- Integrated all modules in `main.rs`, connecting data ingestion, ML, and visualization.  
+- Conducted preliminary end-to-end tests to identify bottlenecks.  
+
+**12th December:**  
+- Finalized and validated integration tests in `integration_test.rs`.  
+- Updated `README.md` with detailed instructions for running the interim pipeline.  
+- Logged all milestones in `diary.md` for traceability.  
+- Prepared codebase for demo video creation showcasing functionality.  
+
+---
 
 ## 5th December 2024
 

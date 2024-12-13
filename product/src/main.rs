@@ -24,7 +24,7 @@ fn main() {
 }
 
 fn run_pipeline() -> Result<(), CustomError> {
-    let file_path = "datasets/sample.csv";
+    let file_path = "product/datasets/sample.csv";
 
     let raw_data: Vec<BTreeMap<String, String>> = load_csv(file_path)
         .map_err(|e| CustomError::FileLoadError(e.to_string()))?
