@@ -23,6 +23,7 @@ Cargo.lock
 /target
 *.toml
 *.lock
+cargo*
 
 #Rust
 /product/src/lib.rs
@@ -31,3 +32,4 @@ Cargo.lock
 /product/datasets
 *.csv
 *.json
+datasets/
