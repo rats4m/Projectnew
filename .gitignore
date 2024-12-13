@@ -1,5 +1,5 @@
 ### VisualStudioCode ###
-/.vscode/
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -17,8 +17,19 @@
 .history
 .ionide
 
-###general
+# Added by cargo
 cargo.toml
-/target
 Cargo.lock
+/target
+*.toml
+*.lock
+cargo*
+
+#Rust
+/product/src/lib.rs
+
+#Resources
 /product/datasets
+*.csv
+*.json
+datasets/

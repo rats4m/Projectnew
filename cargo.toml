@@ -1,0 +1,39 @@
+[package]
+name = "project"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+csv = "1.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = "0.4"
+smartcore = "0.4.0"
+log = "0.4"
+env_logger = "0.11.5"
+plotters = "0.3"
+plotly = "0.11.0"
+
+[[bin]]
+name = "PROJECT"
+path = "product/src/main.rs"
+
+[lib]
+name = "project"
+path = "product/src/lib.rs"
+
+[[test]]
+name = "file_loader_test"
+path = "product/tests/file_loader_test.rs"
+
+[[test]]
+name = "preprocessor_test"
+path = "product/tests/preprocessor_test.rs"
+
+[[test]]
+name = "anomaly_detection_test"
+path = "product/tests/anomaly_detection_test.rs"
+
+[[test]]
+name = "integration_test"
+path = "product/tests/integration_test.rs"
