@@ -1,42 +1,36 @@
-use chrono;
-use std::collections::{ BTreeMap, HashSet };
+use std::collections::BTreeMap;
+use chrono::NaiveDateTime;
 
-
-
-pub fn remove_duplicates(data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
-
-    let mut seen = HashSet::new();
-    data.into_iter()
-        .filter(|record| seen.insert(record.clone()))
-        .collect()
-
-}
-
-
-pub fn normalize_fields(mut data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
-    for record in &mut data {
-        if let Some(ip) = record.get_mut("ip_address") {
-            *ip = ip.trim().to_lowercase();
-        }
-        if let Some(timestamp) = record.get_mut("timestamp") {
-            *timestamp = normalize_timestamp(timestamp);
+/// Normalize timestamps to a standard format.
+pub fn normalize_timestamps(
+    data: &mut Vec<BTreeMap<String, String>>,
+    timestamp_key: &str,
+    format: &str,
+) {
+    for record in data.iter_mut() {
+        if let Some(timestamp) = record.get(timestamp_key) {
+            if let Ok(parsed) = NaiveDateTime::parse_from_str(timestamp, format) {
+                record.insert(timestamp_key.to_string(), parsed.to_string());
+            }
         }
     }
-    data
 }
 
-fn normalize_timestamp(timestamp: &str) -> String {
-    match chrono::DateTime::parse_from_rfc3339(timestamp) {
-        Ok(dt) => dt.to_rfc3339(),
-        Err(_) => timestamp.to_string(),
-    }
+/// Remove duplicate records based on a unique key.
+pub fn remove_duplicates(data: &mut Vec<BTreeMap<String, String>>, unique_key: &str) {
+    let mut seen = std::collections::HashSet::new();
+    data.retain(|record| {
+        if let Some(value) = record.get(unique_key) {
+            seen.insert(value.clone())
+        } else {
+            true
+        }
+    });
 }
 
-pub fn filter_irrelevant_data(
-    data: Vec<BTreeMap<String, String>>,
-    relevant_keys: Vec<String>
-) -> Vec<BTreeMap<String, String>> {
-    data.into_iter()
-        .filter(|record| record.keys().any(|key| relevant_keys.contains(key)))
-        .collect()
+/// Validate records and remove those with missing required keys.
+pub fn validate_records(data: &mut Vec<BTreeMap<String, String>>, required_keys: &[&str]) {
+    data.retain(|record| {
+        required_keys.iter().all(|&key| record.contains_key(key))
+    });
 }

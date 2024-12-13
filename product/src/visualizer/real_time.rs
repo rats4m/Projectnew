@@ -1,4 +1,5 @@
-use plotters::prelude::*;
+use plotly::{Plot, Scatter};
+use plotly::common::{Mode, Marker};
 use std::collections::BTreeMap;
 
 pub fn visualize_anomalies(
@@ -19,42 +20,31 @@ pub fn visualize_anomalies(
         return Err("No valid data".into());
     }
 
-    let root_area = BitMapBackend::new("anomalies_graph.png", (1024, 768)).into_drawing_area();
-    root_area.fill(&WHITE)?;
+    let (x, y): (Vec<f64>, Vec<f64>) = values.iter().cloned().unzip();
 
-    let (min_value, max_value) = values.iter().fold((f64::MAX, f64::MIN), |(min, max), &(_, v)| {
-        (min.min(v), max.max(v))
-    });
+    let anomalies: Vec<(f64, f64)> = values
+        .iter()
+        .cloned()
+        .filter(|&(_, v)| v > threshold)
+        .collect();
 
-    let mut chart = ChartBuilder::on(&root_area)
-        .caption("Anomaly Detection Graph", ("sans-serif", 30).into_font())
-        .margin(10)
-        .x_label_area_size(30)
-        .y_label_area_size(40)
-        .build_cartesian_2d(0f64..values.len() as f64, min_value..max_value)?;
+    let (anomaly_x, anomaly_y): (Vec<f64>, Vec<f64>) = anomalies.iter().cloned().unzip();
 
-    chart.configure_mesh().draw()?;
+    let line_trace = Scatter::new(x.clone(), y.clone())
+        .mode(Mode::LinesMarkers)
+        .name("Data Points")
+        .marker(Marker::new().color("blue"));
 
-    chart.draw_series(LineSeries::new(
-        values.iter().map(|&(x, y)| (x, y)),
-        &BLUE,
-    ))?;
+    let anomaly_trace = Scatter::new(anomaly_x.clone(), anomaly_y.clone())
+        .mode(Mode::Markers)
+        .name("Anomalies")
+        .marker(Marker::new().color("red").size(10));
 
-    chart.draw_series(values.iter().filter_map(|&(x, y)| {
-        if y > threshold {
-            Some(Circle::new((x, y), 5, RED.filled()))
-        } else {
-            None
-        }
-    }))?
-    .label("Anomalies")
-    .legend(|(x, y)| Circle::new((x, y), 5, RED.filled()));
+    let mut plot = Plot::new();
+    plot.add_trace(line_trace);
+    plot.add_trace(anomaly_trace);
 
-    chart
-        .configure_series_labels()
-        .background_style(&WHITE.mix(0.8))
-        .border_style(&BLACK)
-        .draw()?;
+    plot.show(); // Opens in browser for interactivity
 
     Ok(())
 }

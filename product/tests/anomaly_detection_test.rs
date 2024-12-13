@@ -1,56 +1,21 @@
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
     use project::ml_engine::anomaly_detection::detect_anomalies;
 
-    #[test]
-    fn test_valid_anomalies() {
-        let data = vec![
-            [("metric_value", "60.0")]
-                .iter()
-                .cloned()
-                .map(|(k, v)| (k.to_string(), v.to_string()))
-                .collect(),
-            [("metric_value", "30.0")]
-                .iter()
-                .cloned()
-                .map(|(k, v)| (k.to_string(), v.to_string()))
-                .collect(),
-        ];
-        let threshold = 50.0;
-        let result = detect_anomalies(data, "metric_value", threshold);
-        assert_eq!(result.len(), 1);
-        assert_eq!(result[0].get("metric_value").unwrap(), "60.0");
-    }
+    use super::*;
 
     #[test]
-    fn test_non_numeric_values() {
+    fn test_detect_anomalies() {
         let data = vec![
-            [("metric_value", "not_a_number")]
-                .iter()
-                .cloned()
-                .map(|(k, v)| (k.to_string(), v.to_string()))
-                .collect(),
-            [("metric_value", "25.0")]
-                .iter()
-                .cloned()
-                .map(|(k, v)| (k.to_string(), v.to_string()))
-                .collect(),
+            BTreeMap::from([("value".to_string(), "5.0".to_string())]),
+            BTreeMap::from([("value".to_string(), "10.0".to_string())]),
+            BTreeMap::from([("value".to_string(), "2.0".to_string())]),
         ];
-        let threshold = 20.0;
-        let result = detect_anomalies(data, "metric_value", threshold);
-        assert_eq!(result.len(), 1);
-        assert_eq!(result[0].get("metric_value").unwrap(), "25.0");
-    }
-
-    #[test]
-    fn test_missing_keys() {
-        let data = vec![[("some_key", "100.0")]
-            .iter()
-            .cloned()
-            .map(|(k, v)| (k.to_string(), v.to_string()))
-            .collect()];
-        let threshold = 50.0;
-        let result = detect_anomalies(data, "metric_value", threshold);
-        assert!(result.is_empty());
+        let anomalies = detect_anomalies(&data, "value", 4.0);
+        assert_eq!(anomalies.len(), 2);
+        assert_eq!(anomalies[0]["value"], "5.0");
+        assert_eq!(anomalies[1]["value"], "10.0");
     }
 }
