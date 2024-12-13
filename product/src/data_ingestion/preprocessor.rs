@@ -1,12 +1,17 @@
 use chrono;
 use std::collections::{ BTreeMap, HashSet };
 
+
+
 pub fn remove_duplicates(data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
+
     let mut seen = HashSet::new();
     data.into_iter()
         .filter(|record| seen.insert(record.clone()))
         .collect()
+
 }
+
 
 pub fn normalize_fields(mut data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
     for record in &mut data {
