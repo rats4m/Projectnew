@@ -1,12 +1,17 @@
-use std::collections::{HashSet, BTreeMap};
 use chrono;
+use std::collections::{ BTreeMap, HashSet };
+
+
 
 pub fn remove_duplicates(data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
+
     let mut seen = HashSet::new();
     data.into_iter()
         .filter(|record| seen.insert(record.clone()))
         .collect()
+
 }
+
 
 pub fn normalize_fields(mut data: Vec<BTreeMap<String, String>>) -> Vec<BTreeMap<String, String>> {
     for record in &mut data {
@@ -29,11 +34,9 @@ fn normalize_timestamp(timestamp: &str) -> String {
 
 pub fn filter_irrelevant_data(
     data: Vec<BTreeMap<String, String>>,
-    relevant_keys: Vec<String>,
+    relevant_keys: Vec<String>
 ) -> Vec<BTreeMap<String, String>> {
     data.into_iter()
-        .filter(|record| {
-            record.keys().any(|key| relevant_keys.contains(key))
-        })
+        .filter(|record| record.keys().any(|key| relevant_keys.contains(key)))
         .collect()
 }
